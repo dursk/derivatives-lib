@@ -6,7 +6,7 @@ import pandas as pd
 
 QUANDL_BASE_URL = 'http://quandl.com/api/v1/datasets'
 
-def get_futures(contract):
+def get(contract):
     r = requests.get('{}/{}.csv'.format(QUANDL_BASE_URL, contract))
     with open('test.csv', 'wb') as csvfile:
         csvfile.write(r.text)
