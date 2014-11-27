@@ -5,7 +5,7 @@ import requests
 import numpy as np
 import pandas as pd
 
-from lib import formulas
+from lib import formulas, quandl
 
 def get_fixed_storage_cost(storage_cost, risk_free_rate, term):
     return storage_cost * math.exp(-risk_free_rate * term)
