@@ -10,7 +10,7 @@ from auth import AUTH_TOKEN
 QUANDL_BASE_URL = 'http://quandl.com/api/v1/datasets'
 
 
-def get(contract, start=None, end=None):
+def get(contract, start=None, end=None, collapse=None):
     url = '{}/{}.csv?auth_token={}'.format(
         QUANDL_BASE_URL, contract, AUTH_TOKEN
     )
@@ -18,7 +18,8 @@ def get(contract, start=None, end=None):
         url = '{}&trim_start={}'.format(url, start)
     if end:
         url = '{}&trim_end={}'.format(url, end)
-    print url
+    if collapse:
+        url = '{}&collapse={}'.format(url, collapse)
     r = requests.get(url)
     with open('test.csv', 'wb') as csvfile:
         csvfile.write(r.text)
