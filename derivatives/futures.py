@@ -1,11 +1,13 @@
 import math
 from decimal import Decimal
+from datetime import datetime
 
 import requests
 import numpy as np
 import pandas as pd
 
-from lib import formulas, quandl
+from lib import formulas, quandl, helpers
+from data import contracts
 
 MONTHS = ['F', 'G', 'H', 'J', 'K', 'M', 'N', 'Q', 'U', 'V', 'X', 'Z']
 QUARTERS = ['H', 'M', 'U', 'Z']
@@ -23,27 +25,22 @@ def get_value(spot_price, delivery_price, risk_free_rate, term,
     return (spot_price * math.exp(-known_yield * term)) - known_income - \
         (delivery_price * math.exp(-risk_free_rate * term))
 
+def _get_data(contract, start=None, end=None, collapse=None):
+    data = quandl.get(
+        contract, start=start, end=end, collapse=collapse,
+        column=6
+    )
+    return data['Settle'].copy()
 
-
-# def get_oil_vs_6month_rate(start, end):
-#     oil_data = None
-#     formatted_start = '{}-01-01'.format(start)
-#     formatted_end = '{}-12-31'.format(end)
-#     for year in xrange(start, end+1):
-#         for month in MONTHS:
-#             oil_contract = 'CME/B{}{}'.format(month, year)
-#             data = quandl.get(oil_contract)
-#             oil_data = pd.concat([oil_data, data])
-#     interest_data = quandl.get(
-#         'FRED/DTB6',
-#         start=formatted_start,
-#         end=formatted_end
-#     )
-#     oil_data.index  = pd.to_datetime(oil_data.pop('Date'))
-#     interest_data.index  = pd.to_datetime(interest_data.pop('Date'))
-#     oil_data = oil_data.Settle.resample('M', how=['mean'])
-#     interest_data = interest_data.Value.resample('M', how=['mean'])
-
-#     return pd.concat(
-#         [oil_data, interest_data], axis=1, keys=['Oil', 'Interest']
-#     )
+def get_quarterly_diffs(contract, diff_length, start, end):
+    collapse, diff_length = helpers.get_collapse(diff_length)
+    starting_index = contracts.QUARTERLY.index(start)
+    ending_index = contracts.QUARTERLY.index(end)
+    all_data = pd.Series()
+    for i in xrange(starting_index, ending_index + 1):
+        data = _get_data(
+            contract + contracts.QUARTERLY[i],
+            start=None, end=None, collapse=collapse
+        )
+        all_data[data.index[-1]] = data[-1] - data[0]
+    return all_data

@@ -2,7 +2,7 @@ from decimal import Decimal
 
 import pandas as pd
 
-from lib import quandl
+from lib import quandl, helpers
 
 
 def _get_data(contract, start=None, end=None, collapse=None):
@@ -19,10 +19,7 @@ def get_diffs(contract, diff_length, start=None, end=None):
     The diff_length param should be an int representing
     the number of months.
     """
-    collapse = 'monthly'
-    if diff_length >=3:
-        collapse = 'quarterly'
-        diff_length = diff_length / 3
+    collapse, diff_length = helpers.get_collapse(diff_length)
     data = _get_data(
         contract, start=start, end=end, collapse=collapse
     )
