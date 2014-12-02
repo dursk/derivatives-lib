@@ -20,6 +20,7 @@ def get_diffs(contract, diff_length, start=None, end=None):
     the number of months.
     """
     collapse, diff_length = helpers.get_collapse(diff_length)
+    start = helpers.convert_start_date(start, diff_length)
     data = _get_data(
         contract, start=start, end=end, collapse=collapse
     )
