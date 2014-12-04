@@ -11,18 +11,7 @@ from lib import formulas, quandl, helpers
 from data import contracts
 
 MONTHS = ['F', 'G', 'H', 'J', 'K', 'M', 'N', 'Q', 'U', 'V', 'X', 'Z']
-QUARTERS = {
-    'H': '03-31',
-    'M': '06-30',
-    'U': '09-30',
-    'Z': '12-31'
-}
-QUARTERS_START = {
-    '01-01': 'H',
-    '04-01': 'M',
-    '07-01': 'U',
-    '10-01': 'Z'
-}
+
 
 def get_fixed_storage_cost(storage_cost, risk_free_rate, term):
     return storage_cost * math.exp(-risk_free_rate * term)
@@ -46,7 +35,7 @@ def _get_data(contract, start=None, end=None, collapse=None):
 
 def get_quarterly_diffs(contract, diff_length, start, end):
     collapse, diff_length = helpers.get_collapse(diff_length)
-    start = helpers.convert_start_date(start)
+    start = helpers.convert_start_date(start, diff_length)
     start_c = '{}{}'.format(QUARTERS_REVERSE[start[5:]], start[:3])
     end_c = '{}{}'.format(QUARTERS_REVERSE[end[5:]], end[:3])
     starting_index = contracts.QUARTERLY.index(start_c)
